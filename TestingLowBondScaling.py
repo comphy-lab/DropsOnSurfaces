@@ -85,7 +85,7 @@ def LaplaceEqn(t, y, Bo, KappaT):
 
 # stop integration when Phi = pi
 def event(t, y, Bo, KappaT):
-    return y[0] - 1.001*pi
+    return y[0] - pi
 
 # calculate the volume of the drop given by (R, Z)
 def volume(R, Z):
@@ -120,7 +120,7 @@ def getDrop(Bo, KappaT):
 def CorrectDrop(Bo, CountMax, lr, KappaT):
       Error, VolError = [], 1.0
       count = 0
-      while (abs(VolError) > 1.0e-10 and count < CountMax):
+      while (abs(VolError) > 1.0e-30 and count < CountMax):
         print('------------------------------------')
         count += 1
         sol = getDrop(Bo, KappaT)
@@ -367,21 +367,21 @@ def Plotting(R, Z, S, Phi, r, z, filename, Bo, KappaT, Zcm, InterfaceBas, TestWi
 
 # %%
 # Learning rate for the gradient descent algorithm and the maximum number of iterations, whether to plot the results, whether to plot error decay from the gradient descent, and the domain length for Basilisk code
-lr, CountMax, Plot, PlotError, L0, TestWithBasilisk = 0.25, 500, False, False, 8.0, False
+lr, CountMax, PlotError, L0, TestWithBasilisk = 0.25, 1000, False, 8.0, False
 # TestWithBasilisk True needs a compiled Basilisk code in the same folder called InitialCondition.c. If you do not have this code, set TestWithBasilisk to False.
 
 # Bond number is the input parameter. Use an array here to loop over multiple Bond numbers if needed. 
 # BondNumbers = array([1e-3, 1e-2, 1e-1, 1e0, 1e1, 1e2, 1e3])
-temp = 10**arange(-8, -3, 0.1)
+temp = 10**arange(-8, -3, 0.50)
 BondNumbers = temp 
-temp = 10**arange(-3, -1, 0.05)
+temp = 10**arange(-3, -1, 0.20)
 BondNumbers = concatenate((BondNumbers, temp))
-temp = 10**arange(-1, 0, 0.01)
+temp = 10**arange(-1, 0, 0.10)
 BondNumbers = concatenate((BondNumbers, temp))
-temp = 10**arange(0, 1, 0.01)
+temp = 10**arange(0, 1, 0.10)
 BondNumbers = concatenate((BondNumbers, temp))
-# temp = 10**arange(1, 2, 0.1)
-# BondNumbers = concatenate((BondNumbers, temp))
+temp = 10**arange(1, 2, 0.20)
+BondNumbers = concatenate((BondNumbers, temp))
 # temp = 10**arange(2, 3, 0.2)
 # BondNumbers = concatenate((BondNumbers, temp))
 
@@ -393,6 +393,12 @@ Width = zeros_like(BondNumbers)
 Rfoot = zeros_like(BondNumbers)
 Perimeter = zeros_like(BondNumbers)
 SurfaceArea = zeros_like(BondNumbers)
+
+PlotList=zeros_like(BondNumbers)
+for i in range(len(BondNumbers)):
+    if i % 10 == 0:
+         PlotList[i] = 1
+Plot = PlotList.astype(bool)
 
 folder='TestingImages'
 if not os.path.exists(folder):
@@ -407,6 +413,7 @@ else:
    Table=False
 
 for Bo in BondNumbers:
+  Plot = PlotList[where(BondNumbers==Bo)]
   if Table:
      # find the index of the closest value to the input value
      idx = (abs(df['Bond'] - Bo)).argmin()
@@ -483,4 +490,4 @@ for Bo in BondNumbers:
 # %%
 data = {'KappaT': KappaTlist, 'Bond': BondNumbers, 'Height': Height, 'Zcm': Zcm, 'Width': Width, 'Rfoot': Rfoot, 'Perimeter': Perimeter, 'SurfaceArea': SurfaceArea}
 df = pd.DataFrame(data)
-df.to_csv('NormalizedR0_Data_v2_LowBond.csv', index=False, sep=',', float_format='%.15e')
+df.to_csv('NormalizedR0_Data_v3.csv', index=False, sep=',', float_format='%.15e')
