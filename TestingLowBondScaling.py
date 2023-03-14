@@ -107,10 +107,10 @@ def getDrop(Bo, KappaT):
   y0.reshape(3,)
 
   # parameterizatio is done using the arc length s
-  s0, sMax, ds = 0.0, 1.1*pi, 1e-7
+  s0, sMax, ds = 0.0, 1.1*pi, 5e-8
   
   event.terminal = True
-  return solve_ivp(LaplaceEqn, [s0, sMax], y0, args=(Bo, KappaT), t_eval=arange(s0, sMax, ds), events=event, rtol=1e-12, atol=1e-16)
+  return solve_ivp(LaplaceEqn, [s0, sMax], y0, args=(Bo, KappaT), t_eval=arange(s0, sMax, ds), events=event, rtol=1e-15, atol=1e-20)
 
 
 # %% [markdown]
